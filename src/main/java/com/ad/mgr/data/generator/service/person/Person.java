@@ -1,5 +1,6 @@
 package com.ad.mgr.data.generator.service.person;
 
+import com.ad.mgr.data.cards.dto.CreateCardDto;
 import com.ad.mgr.data.employee.dto.CreateEmployeeDto;
 import lombok.Getter;
 
@@ -7,7 +8,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.ad.mgr.data.generator.service.person.EmployeeDataHelper.*;
+import static com.ad.mgr.data.generator.EmployeeDataHelper.*;
+import static com.ad.mgr.data.generator.EmployeeDataHelper.getRandomElementFromList;
+
 
 @Getter
 public abstract class Person {
@@ -18,7 +21,6 @@ public abstract class Person {
     private final LocalDate dateOfBirth;
     private final LocalDate endOfContract;
     private final String position;
-    private final Long cardId;
 
     Person() {
         this.name = generateName();
@@ -26,24 +28,23 @@ public abstract class Person {
         this.surname = generateSurname();
         this.dateOfBirth = generateDateOfBirth();
         this.position = generatePosition();
-        this.endOfContract = generateOfContract();
-        this.cardId = 0L;
+        this.endOfContract = generateDateOfContract();
     }
 
     private String generateName() {
-        return generateRandomString(getNameList());
+        return getRandomElementFromList(getNameList());
     }
 
     private String generateSecondName() {
         var secondName = "";
         do {
-            secondName = generateRandomString(getNameList());
+            secondName = getRandomElementFromList(getNameList());
         } while (secondName.equals(this.name));
         return generateRandomBoolean() ? secondName : "";
     }
 
     private String generateSurname() {
-        return generateRandomString(getSurnameList());
+        return getRandomElementFromList(getSurnameList());
     }
 
     private LocalDate generateDateOfBirth() {
@@ -53,12 +54,18 @@ public abstract class Person {
     }
 
     private String generatePosition() {
-        return generateRandomString(getPositions());
+        return getRandomElementFromList(getPositions());
     }
 
-    private LocalDate generateOfContract() {
+    private LocalDate generateDateOfContract() {
         long minDay = LocalDate.now().toEpochDay();
         long maxDay = LocalDate.of(2030, 12, 31).toEpochDay();
+        return generatorLocalDataTime(minDay, maxDay);
+    }
+
+    private LocalDate generateExpirationDate() {
+        long minDay = LocalDate.now().minusDays(5).toEpochDay();
+        long maxDay = endOfContract.toEpochDay();
         return generatorLocalDataTime(minDay, maxDay);
     }
 
@@ -66,12 +73,22 @@ public abstract class Person {
 
     protected abstract List<String> getSurnameList();
 
+    protected abstract byte[] getPhoto();
+
     private LocalDate generatorLocalDataTime(Long minDay, Long maxDay) {
         long randomDay = ThreadLocalRandom.current().nextLong(minDay, maxDay);
         return LocalDate.ofEpochDay(randomDay);
     }
 
-    public CreateEmployeeDto getAsCreateEmployeeDto(){
+    public CreateCardDto getCardForEmployee(){
+        return new CreateCardDto(
+                getAccessPlaces(),
+                generateExpirationDate(),
+                getPhoto()
+        );
+    }
+
+    public CreateEmployeeDto getAsCreateEmployeeDto(long cardId){
         return new CreateEmployeeDto(
                 name,
                 secondName,

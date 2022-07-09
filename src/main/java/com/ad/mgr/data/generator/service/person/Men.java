@@ -1,9 +1,11 @@
 package com.ad.mgr.data.generator.service.person;
 
+import lombok.SneakyThrows;
+
 import java.util.List;
 
-import static com.ad.mgr.data.generator.service.person.EmployeeDataHelper.getMenNames;
-import static com.ad.mgr.data.generator.service.person.EmployeeDataHelper.getMenSurnames;
+import static com.ad.mgr.data.generator.EmployeeDataHelper.*;
+
 
 public class Men extends Person{
     @Override
@@ -14,5 +16,10 @@ public class Men extends Person{
     @Override
     protected List<String> getSurnameList() {
         return getMenSurnames();
+    }
+
+    @SneakyThrows
+    protected byte[] getPhoto() {
+        return getRandomPhotoFromResources("static/men");
     }
 }

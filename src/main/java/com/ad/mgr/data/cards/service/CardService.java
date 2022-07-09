@@ -19,4 +19,6 @@ public interface CardService {
     Card updateCard(UpdateCardDto updateCardDto);
 
     void deleteCard(Long cardId);
+
+    List<Card> findAll();
 }

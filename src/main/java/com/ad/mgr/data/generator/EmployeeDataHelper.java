@@ -1,7 +1,12 @@
-package com.ad.mgr.data.generator.service.person;
+package com.ad.mgr.data.generator;
 
-import java.util.List;
-import java.util.Random;
+import com.ad.mgr.data.cards.entity.AccessPlaces;
+import org.apache.commons.io.FileUtils;
+import org.springframework.core.io.ClassPathResource;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 public class EmployeeDataHelper {
 
@@ -63,12 +68,32 @@ public class EmployeeDataHelper {
                 "Prokop", "Malicka", "Gwóźdź", "Sochacka", "Bożek", "Jurkowska", "Świerczyńska");
     }
 
-    public static String generateRandomString(List<String> stringList) {
-        return stringList.get(new Random().nextInt(stringList.size()));
+    public static  <E> E getRandomElementFromList(List<E> objectList) {
+        return objectList.get(new Random().nextInt(objectList.size()));
     }
 
-    public static boolean generateRandomBoolean(){
+    public static Set<AccessPlaces> getAccessPlaces(){
+        Set<AccessPlaces> accessPlacesSet = new HashSet<>();
+        for (int i = 0; i < 2; i++) {
+            accessPlacesSet.add(getAllAccessPlaces().get(new Random().nextInt(getAllAccessPlaces().size())));
+        }
+        return accessPlacesSet;
+    }
+
+    public static boolean generateRandomBoolean() {
         return Math.random() < 0.5;
     }
 
+    public static byte[] getRandomPhotoFromResources(String url) throws IOException {
+        return FileUtils.readFileToByteArray(getRandomElementFromList(getFileFromURL(url)));
+    }
+
+    private static List<File> getFileFromURL(String url) throws IOException {
+        File folder = new ClassPathResource(url).getFile();
+        return Arrays.stream(Objects.requireNonNull(folder.listFiles())).toList();
+    }
+
+    public static List<AccessPlaces> getAllAccessPlaces(){
+        return new ArrayList<>(Arrays.stream(AccessPlaces.values()).toList());
+    }
 }

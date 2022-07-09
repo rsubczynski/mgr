@@ -1,14 +1,15 @@
 package com.ad.mgr.data.cards.entity;
 
 public enum AccessPlaces {
-    NONE(""),
+    GATE("Brama"),
     OFFICE("Biuro"),
     LAB("Laboratorium"),
     BOOKKEEPING("Ksiegowosc"),
-    TEST_STATION("Stacja_prob"),
-    MANAGEMENT("Zarzad"),
     FABRIC("Fabryka"),
-    PAINT_SHOW("Lakiernia");
+    TEST_STATION("Stacja_prob"),
+    WELDING("Spawalnia"),
+    PAINT_SHOW("Lakiernia"),
+    MANAGEMENT("Zarzad");
 
     private final String location;
 

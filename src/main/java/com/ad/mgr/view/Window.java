@@ -1,8 +1,12 @@
 package com.ad.mgr.view;
 
 import com.ad.mgr.data.cards.service.CardService;
+import com.ad.mgr.data.employee.dto.UpdateCardIdDto;
 import com.ad.mgr.data.employee.service.EmployeeService;
 import com.ad.mgr.view.parts.cardpanel.CardPanel;
+import com.ad.mgr.view.parts.cardpanel.CardPanelConnector;
+import com.ad.mgr.view.parts.cardpanel.parts.config.CardPanelConfig;
+import com.ad.mgr.view.parts.cardpanel.parts.config.CardPanelMode;
 import com.ad.mgr.view.parts.userpanel.UserPanel;
 import com.ad.mgr.view.parts.employeelist.EmployeeDataAdapter;
 import com.ad.mgr.view.parts.employeelist.EmployeeTable;
@@ -20,9 +24,9 @@ import java.awt.*;
 import static com.ad.mgr.view.util.ListUtils.indexExists;
 import static com.ad.mgr.view.parts.homebar.HomeBarButtons.HOME;
 
-public class Window extends JPanel implements HomeBarConnector, UserPanelConnector {
+public class Window extends JPanel implements HomeBarConnector, UserPanelConnector, CardPanelConnector {
 
-    private final  CardService cardService;
+    private final CardService cardService;
     private final EmployeeService employeeService;
     private Long selectedId;
     private EmployeeTable employeeTable;
@@ -30,12 +34,13 @@ public class Window extends JPanel implements HomeBarConnector, UserPanelConnect
     private JScrollPane employeeListScrollPane;
     private final HomeBar homeBar = new HomeBar(this);
     private final UserPanel userPanel;
-    private final CardPanel cardPanel = new CardPanel();
+    private final CardPanel cardPanel;
 
     public Window(EmployeeService employeeService, CardService cardService) {
         this.cardService = cardService;
         this.employeeService = employeeService;
         this.userPanel = new UserPanel(employeeService, this);
+        this.cardPanel = new CardPanel(cardService, this);
         init();
     }
 
@@ -51,11 +56,11 @@ public class Window extends JPanel implements HomeBarConnector, UserPanelConnect
 
     private void init() {
         setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(500, 500));
+        setPreferredSize(new Dimension(550, 500));
         employeeTableConfig();
         homeBar.disableButtons();
         jtp = new JTabbedPane();
-        jtp.setUI(new BasicTabbedPaneUI(){
+        jtp.setUI(new BasicTabbedPaneUI() {
             @Override
             protected int calculateTabAreaHeight(int tabPlacement, int horizRunCount, int maxTabHeight) {
                 return 0;
@@ -66,7 +71,6 @@ public class Window extends JPanel implements HomeBarConnector, UserPanelConnect
         jtp.addTab("", userPanel);
         jtp.addTab("", cardPanel);
         add(jtp);
-
     }
 
     void employeeTableConfig() {
@@ -93,18 +97,20 @@ public class Window extends JPanel implements HomeBarConnector, UserPanelConnect
         }
     }
 
+
     public void homeClicked() {
         employeeTable.refreshData();
         homeBar.showLeftMenu();
     }
 
+
     public void addNewUserClicked() {
-       userPanel.setConfig(getUserConfig(UserPanelMode.ADD));
+        userPanel.setConfig(getUserConfig(UserPanelMode.ADD));
     }
 
     public void deleteClicked() {
         var employee = employeeService.findById(selectedId);
-        if(employee.getCardId() != 0){
+        if (employee.getCardId() != 0) {
             cardService.deleteCard(employee.getCardId());
         }
         employeeService.deleteEmployeeById(selectedId);
@@ -116,10 +122,13 @@ public class Window extends JPanel implements HomeBarConnector, UserPanelConnect
     }
 
     public void addCardClicked() {
-        //TODO: implement
+        var employee = employeeService.findById(selectedId);
+        cardPanel.setConfig(
+                getCardConfig(employee.getCardId(), employee.getCardId() == 0L ? CardPanelMode.ADD : CardPanelMode.EDIT)
+        );
     }
 
-    private UserPanelConfig getUserConfig(UserPanelMode mode){
+    private UserPanelConfig getUserConfig(UserPanelMode mode) {
         return UserPanelConfig
                 .builder()
                 .id(selectedId)
@@ -127,8 +136,22 @@ public class Window extends JPanel implements HomeBarConnector, UserPanelConnect
                 .build();
     }
 
+    private CardPanelConfig getCardConfig(Long cardId, CardPanelMode mode) {
+        return CardPanelConfig
+                .builder()
+                .cardId(cardId)
+                .cardPanelMode(mode)
+                .build();
+    }
+
     @Override
-    public void userAddClicked() {
+    public void userAddEmployeeClicked() {
+        homeBarClicked(HOME);
+    }
+
+    @Override
+    public void userAddCardClicked(Long cardId) {
+        employeeService.updateCardId(new UpdateCardIdDto(selectedId, cardId));
         homeBarClicked(HOME);
     }
 }

@@ -31,6 +31,16 @@ public class DataPickerHelper {
                 dateToConvert.getModel().getDay());
     }
 
+    public static LocalDate convertToLocalDateCard(JDatePickerImpl dateToConvert) {
+        if (!dateToConvert.getModel().isSelected()) {
+            return null;
+        }
+        return LocalDate.of(
+                dateToConvert.getModel().getYear(),
+                dateToConvert.getModel().getMonth() + 1,
+                dateToConvert.getModel().getDay());
+    }
+
     private static Date convertToDateViaInstant(LocalDate dateToConvert) {
         return java.util.Date.from(dateToConvert.atStartOfDay()
                 .atZone(ZoneId.systemDefault())

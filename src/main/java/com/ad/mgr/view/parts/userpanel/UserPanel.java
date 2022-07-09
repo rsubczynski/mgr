@@ -67,7 +67,7 @@ public class UserPanel extends JPanel implements UserButtonsConnector {
             } else {
                 updateEmployee(employee);
             }
-            userPanelConnector.userAddClicked();
+            userPanelConnector.userAddEmployeeClicked();
         } else {
             JOptionPane.showMessageDialog(formPanel, "Prosze uzupełnić wszystkie pola");
         }

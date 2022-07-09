@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Setter
 public class Card {
 
-    Card() {
+    public Card() {
     }
 
     public Card(LocalDate expirationDate, Set<AccessPlaces> accessPlacesList, byte[] image) {
@@ -38,11 +38,12 @@ public class Card {
 
     @Column(name = "accessPlaces")
     private String accessPlaces;
-
+    @Lob
+    @Column(name = "image", columnDefinition="BLOB")
     private byte[] image;
 
     public Set<AccessPlaces> getAccessPlaces() {
-        return (null == accessPlaces) ?
+        return (null == accessPlaces || accessPlaces.equals("")) ?
                 Collections.emptySet() :
                 Arrays.stream(accessPlaces.split(",")).map(AccessPlaces::fromString).collect(Collectors.toSet());
     }

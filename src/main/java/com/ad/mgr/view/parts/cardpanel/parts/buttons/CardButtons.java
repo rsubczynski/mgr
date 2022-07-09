@@ -15,7 +15,6 @@ public class CardButtons extends JPanel {
         setLayout(new FlowLayout());
         add(userActionButton);
         add(deleteButton);
-        setBorder(BorderFactory.createEmptyBorder(30, 0, 50, 200));
         userActionButton.addActionListener(event -> buttonsConnector.userActionButtonClicked());
         deleteButton.addActionListener(event -> buttonsConnector.deleteButtonClicked());
     }

@@ -2,8 +2,10 @@ package com.ad.mgr;
 
 import com.ad.mgr.data.cards.service.CardService;
 import com.ad.mgr.data.employee.service.EmployeeService;
-import com.ad.mgr.data.generator.service.EmployeeGeneratorService;
+import com.ad.mgr.data.generator.service.DataGeneratorService;
 import com.ad.mgr.view.Window;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.*;
@@ -15,6 +17,9 @@ import javax.swing.*;
 @SpringBootApplication
 public class MgrApplication implements CommandLineRunner {
 
+    private final Logger logger = LoggerFactory.getLogger(MgrApplication.class);
+
+
     @Autowired
     private EmployeeService employeeService;
 
@@ -22,7 +27,7 @@ public class MgrApplication implements CommandLineRunner {
     private CardService cardService;
 
     @Autowired
-    private EmployeeGeneratorService employeeGeneratorService;
+    private DataGeneratorService dataGeneratorService;
 
     @Value("${spring.application.name}")
     private String appName;
@@ -38,7 +43,8 @@ public class MgrApplication implements CommandLineRunner {
     @Override
     public void run(String... args) {
         //TODO: generator :D
-        //employeeGeneratorService.generateEmployeeWithCardIdAs0(10);
+        dataGeneratorService.generateEmployeeWithCards(0);
+        logger.info("START APP VIEW");
         SwingUtilities.invokeLater(() -> Window.showFrame(appName, employeeService, cardService));
     }
 }
